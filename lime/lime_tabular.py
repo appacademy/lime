@@ -7,6 +7,7 @@ import json
 import warnings
 
 import numpy as np
+import pandas as pd
 import sklearn
 import sklearn.preprocessing
 from sklearn.utils import check_random_state
@@ -226,7 +227,9 @@ class LimeTabularExplainer(object):
                          num_features=10,
                          num_samples=5000,
                          distance_metric='euclidean',
-                         model_regressor=None):
+                         model_regressor=None, 
+                         as_df=False, 
+                         column_names=[]):
         """Generates explanations for a prediction.
 
         First, we generate neighborhood data by randomly perturbing features
@@ -267,8 +270,11 @@ class LimeTabularExplainer(object):
                 scaled_data[0].reshape(1, -1),
                 metric=distance_metric
         ).ravel()
-
-        yss = predict_fn(inverse)
+        
+        if as_df: 
+            yss = predict_fn(pd.DataFrame(inverse, columns=column_names))
+        else: 
+            yss = predict_fn(inverse)
 
         # for classification, the model needs to provide a list of tuples - classes
         # along with prediction probabilities
